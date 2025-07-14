@@ -13,7 +13,7 @@ export interface AuthState {
   logout: () => void;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://notesmanager-1-5ynb.onrender.com/api';
 
 export const loginApi = async (email: string, password: string): Promise<User> => {
   const res = await fetch(`${BASE_URL}/auth/login`, {

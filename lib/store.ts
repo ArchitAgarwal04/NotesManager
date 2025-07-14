@@ -45,7 +45,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 }));
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://notesmanager-1-5ynb.onrender.com/api';
 
 export interface Note {
   id: string;
