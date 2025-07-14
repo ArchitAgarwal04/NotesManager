@@ -44,9 +44,9 @@ export default function Signup() {
       await signup(name, email, password);
       toast.success('Account created successfully!');
       router.push('/notes');
-    } catch (err) {
-      setError('Failed to create account. Please try again.');
-      toast.error('Signup failed. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'Failed to create account. Please try again.');
+      toast.error(err.message || 'Signup failed. Please try again.');
     }
   };
 

@@ -21,9 +21,11 @@ export const loginApi = async (email: string, password: string): Promise<User> =
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
-  if (!res.ok) throw new Error('Invalid credentials');
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error || 'Invalid credentials');
+  }
   const data = await res.json();
-  // Optionally fetch user profile if needed
   return { id: '', name: '', email, token: data.token };
 };
 
@@ -33,7 +35,10 @@ export const signupApi = async (name: string, email: string, password: string): 
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password }),
   });
-  if (!res.ok) throw new Error('Signup failed');
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error || 'Signup failed');
+  }
   const data = await res.json();
   return { id: '', name, email, token: data.token };
 };
