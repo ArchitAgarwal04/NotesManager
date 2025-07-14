@@ -1,177 +1,92 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Github } from "lucide-react";
+import { motion } from "framer-motion";
 import { useAuthStore } from '@/lib/store';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { BookOpen, Bookmark, Search, Star, Shield, Zap } from 'lucide-react';
-import { motion } from 'framer-motion';
+import MacCodeEditorBanner from "@/components/MacCodeEditorBanner";
+
+const heroWords = [
+  { text: "Create.", color: "text-[#FF6B81]" },
+  { text: "Organize.", color: "text-[#5BE9B9]" },
+  { text: "Share.", color: "text-[#FFD600]" },
+  { text: "Easy.", color: "bg-[#FFD600] text-[#232946] px-2 rounded-md ml-2" },
+];
 
 export default function Home() {
-  const { user, initializeAuth } = useAuthStore();
-  const router = useRouter();
-
-  useEffect(() => {
-    initializeAuth();
-  }, [initializeAuth]);
-
-  useEffect(() => {
-    if (user) {
-      router.push('/notes');
-    }
-  }, [user, router]);
-
-  const features = [
-    {
-      icon: <BookOpen className="h-8 w-8 text-blue-600" />,
-      title: "Smart Notes",
-      description: "Create, organize and search through your notes with powerful tagging and filtering."
-    },
-    {
-      icon: <Bookmark className="h-8 w-8 text-green-600" />,
-      title: "Bookmark Manager",
-      description: "Save and organize your favorite websites with automatic title fetching and descriptions."
-    },
-    {
-      icon: <Search className="h-8 w-8 text-purple-600" />,
-      title: "Powerful Search",
-      description: "Find anything instantly with full-text search across all your notes and bookmarks."
-    },
-    {
-      icon: <Star className="h-8 w-8 text-yellow-600" />,
-      title: "Favorites",
-      description: "Mark important notes and bookmarks as favorites for quick access."
-    },
-    {
-      icon: <Shield className="h-8 w-8 text-red-600" />,
-      title: "Secure",
-      description: "Your data is protected with modern security practices and encrypted storage."
-    },
-    {
-      icon: <Zap className="h-8 w-8 text-orange-600" />,
-      title: "Lightning Fast",
-      description: "Built with performance in mind - everything loads instantly."
-    }
-  ];
+  const { user } = useAuthStore();
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="min-h-screen bg-gradient-to-br from-black via-[#191C3A] to-black text-white flex flex-col">
+      {/* Navbar - removed, now using global Navbar */}
+
       {/* Hero Section */}
-      <div className="container mx-auto px-4 pt-20 pb-16 relative">
-        {/* Background decorative elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
-        </div>
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center relative z-10"
-        >
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-            Your Digital
-            <span className="text-yellow-300"> Memory</span>
-          </h1>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Capture thoughts, organize ideas, and bookmark the web. 
-            NotesKeeper helps you remember everything that matters.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/signup">
-              <Button size="lg" className="text-lg px-8 py-3 bg-white text-primary-600 hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all duration-300">
-                Get Started Free
-              </Button>
-            </Link>
-            <Link href="/login">
-              <Button variant="outline" size="lg" className="text-lg px-8 py-3 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm">
-                Sign In
-              </Button>
-            </Link>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Features Section */}
-      <div className="container mx-auto px-4 py-16 bg-white relative">
-        {/* Background pattern */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-50/30 to-transparent"></div>
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-center mb-16 relative z-10"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-4">
-            Everything you need to stay organized
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Simple, powerful tools to capture, organize, and find your information when you need it.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 + index * 0.1 }}
-            >
-              <Card className="h-full card-hover bg-gradient-card border-0 shadow-lg">
-                <CardContent className="p-6">
-                  <div className="flex items-center mb-4">
-                    <div className="p-3 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl shadow-lg">
-                      {React.cloneElement(feature.icon, { className: "h-6 w-6 text-white" })}
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-900 ml-3">
-                      {feature.title}
-                    </h3>
-                  </div>
-                  <p className="text-gray-600 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="bg-gradient-to-r from-primary-600 via-secondary-600 to-accent-600 text-white py-16 relative overflow-hidden">
-        {/* Background decorative elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-        </div>
-        
-        <div className="container mx-auto px-4 text-center">
+      <main className="flex flex-1 flex-col md:flex-row items-center justify-between px-8 md:px-20 py-12 md:py-0 relative z-10">
+        {/* Left: Headline and CTA */}
+        <div className="flex-1 flex flex-col items-start justify-center max-w-xl z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="relative z-10"
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7 }}
+            className="mb-6"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Start organizing your digital life today
-            </h2>
-            <p className="text-xl mb-8 text-white/90">
-              Join thousands of users who trust NotesKeeper to keep their thoughts and bookmarks organized.
+            <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-4">
+              <span className="text-blue-400">Create.</span>{' '}
+              <span className="text-green-400">Organize.</span>{' '}
+              <span className="text-yellow-300">Share.</span>{' '}
+              <span className="bg-white text-black px-3 py-1 rounded-md ml-2 border-2 border-black font-extrabold">Easy.</span>
+            </h1>
+            <p className="text-lg md:text-xl bg-gradient-to-r from-blue-300 via-gray-200 to-blue-100 bg-clip-text text-transparent mb-8 max-w-md">
+              NoteNest is the best place to jot down quick thoughts or to save longer notes filled with checklists, images, web links, scanned docs, handwriting, and more.
             </p>
-            <Link href="/signup">
-              <Button size="lg" className="text-lg px-8 py-3 bg-white text-primary-600 hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all duration-300">
-                Create Your Account
-              </Button>
-            </Link>
+            <div className="flex gap-4 mb-4">
+              <Link href="/signup">
+                <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-700 hover:to-blue-500 text-white font-bold px-8 py-3 rounded-full shadow-xl text-lg transition-all duration-200">
+                  Try now for free
+                </Button>
+              </Link>
+              <Link href="/notes">
+                <Button size="lg" className="bg-gradient-to-r from-green-400 to-green-600 hover:from-green-600 hover:to-green-400 text-white font-bold px-8 py-3 rounded-full text-lg transition-all duration-200">
+                  See how it works
+                </Button>
+              </Link>
+            </div>
+            <div className="flex items-center gap-2 mt-4">
+              <img src="/user-avatar.png" alt="Team" className="w-10 h-10 rounded-full border-2 border-blue-400" onError={e => (e.currentTarget.style.display = 'none')}/>
+              <span className="text-purple-400 text-sm font-semibold">From Team NoteNest</span>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <span className="bg-white/10 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold shadow-lg text-xl">✏️</span>
+              <span className="bg-white/10 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold shadow-lg text-xl">📋</span>
+              <span className="bg-white/10 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold shadow-lg text-xl">⭐</span>
+            </div>
           </motion.div>
         </div>
-      </div>
+        {/* Right: Illustration replaced with code editor banner */}
+        <div className="flex-1 flex items-center justify-center w-full md:w-auto z-10">
+          <MacCodeEditorBanner />
+        </div>
+        {/* Floating sticky note */}
+        <motion.div
+          initial={{ opacity: 0, y: -30, x: 30 }}
+          animate={{ opacity: 1, y: 0, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="absolute top-24 right-1/3 bg-[#FFD600] text-[#232946] px-6 py-3 rounded-lg shadow-lg font-semibold text-lg z-0"
+        >
+          Simple Notes. Planning Tools.
+        </motion.div>
+      </main>
+      {/* Footer */}
+      <footer className="w-full py-6 text-center text-gray-400 text-sm border-t border-[#232946] bg-[#181C2A]/80 mt-auto">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-2">
+          <span>© {new Date().getFullYear()} NoteNest. All rights reserved.</span>
+          <a href="https://github.com/ArchitAgarwal04/NotesManager" target="_blank" rel="noopener noreferrer" className="text-[#5BE9B9] hover:underline flex items-center gap-1 ml-2">
+            <Github className="h-4 w-4" /> GitHub
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }

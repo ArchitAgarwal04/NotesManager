@@ -107,17 +107,17 @@ export default function Notes() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50">
+      <div className="min-h-screen bg-gradient-to-br from-black via-[#191C3A] to-black">
         <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-between mb-8 bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
+          <div className="flex items-center justify-between mb-8 bg-black/80 border border-white/20 shadow-2xl shadow-black/70 rounded-2xl p-8">
             <div>
-              <h1 className="text-3xl font-bold gradient-text flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl">
-                  <BookOpen className="h-6 w-6 text-white" />
+              <h1 className="text-3xl font-extrabold text-white drop-shadow flex items-center gap-3">
+                <div className="p-2 bg-white/10 rounded-full">
+                  <BookOpen className="h-7 w-7 text-white" />
                 </div>
                 My Notes
               </h1>
-              <p className="text-gray-600 mt-2 flex items-center gap-4">
+              <p className="text-gray-400 mt-2 flex items-center gap-4">
                 {notes.length} notes • {notes.filter(n => n.favorite).length} favorites
               </p>
             </div>
@@ -141,7 +141,8 @@ export default function Notes() {
             </div>
           </div>
 
-          <div className="mb-6 bg-white/60 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20">
+          {/* Remove background around search bar, make it small */}
+          <div className="mb-6">
             <SearchFilter
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
@@ -153,7 +154,7 @@ export default function Notes() {
           </div>
 
           {filteredNotes.length === 0 ? (
-            <div className="text-center py-12 bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20">
+            <div className="text-center py-12 bg-black/80 rounded-2xl shadow-2xl shadow-black/70 border border-white/20">
               <div className="p-4 bg-gradient-to-r from-primary-100 to-secondary-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
                 <BookOpen className="h-10 w-10 text-primary-600" />
               </div>
@@ -178,13 +179,21 @@ export default function Notes() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <AnimatePresence>
                 {filteredNotes.map(note => (
-                  <NoteCard
+                  <motion.div
                     key={note.id}
-                    note={note}
-                    onEdit={handleEditNote}
-                    onDelete={handleDeleteNote}
-                    onToggleFavorite={handleToggleFavorite}
-                  />
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -30 }}
+                    whileHover={{ scale: 1.04, boxShadow: '0 8px 32px 0 rgba(0,0,0,0.7)' }}
+                    transition={{ duration: 0.4, type: 'spring' }}
+                  >
+                    <NoteCard
+                      note={note}
+                      onEdit={handleEditNote}
+                      onDelete={handleDeleteNote}
+                      onToggleFavorite={handleToggleFavorite}
+                    />
+                  </motion.div>
                 ))}
               </AnimatePresence>
             </div>

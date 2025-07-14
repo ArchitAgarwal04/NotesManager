@@ -38,79 +38,56 @@ export default function BookmarkCard({ bookmark, onEdit, onDelete, onToggleFavor
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      layout
-    >
-      <Card className="h-full card-hover bg-gradient-card border-0 shadow-lg">
-        <CardHeader className="pb-2">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h3 className="font-semibold text-lg line-clamp-2 text-gray-800">{bookmark.title}</h3>
-              <p className="text-sm text-secondary-500 mt-1 font-medium">{getDomain(bookmark.url)}</p>
-              <p className="text-xs text-gray-400 mt-1">{formatDate(bookmark.createdAt)}</p>
-            </div>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onToggleFavorite(bookmark.id)}
-                className="p-1 h-auto hover:bg-pink-50 rounded-full"
-              >
-                <Heart
-                  className={`h-4 w-4 ${
-                    bookmark.favorite ? 'text-pink-500 fill-pink-500' : 'text-gray-400 hover:text-pink-400'
-                  }`}
-                />
+    <div className="bg-[#23272E] rounded-xl shadow-2xl border border-[#2D313A]/80 p-0 overflow-hidden">
+      {/* Editor Top Bar */}
+      <div className="h-8 bg-[#1E2127] rounded-t-xl flex items-center px-4 justify-between">
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 bg-[#FF5F56] rounded-full mr-1"></span>
+          <span className="w-3 h-3 bg-[#FFBD2E] rounded-full mr-1"></span>
+          <span className="w-3 h-3 bg-[#27C93F] rounded-full"></span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" className="p-1 h-7 w-7 text-gray-400 hover:text-white" onClick={() => onToggleFavorite(bookmark.id)}>
+            <Heart className={`h-4 w-4 ${bookmark.favorite ? 'fill-current text-pink-500' : ''}`} />
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="p-1 h-7 w-7 text-gray-400 hover:text-white">
+                <MoreVertical className="h-4 w-4" />
               </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="p-1 h-auto hover:bg-secondary-50 rounded-full">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="glass-effect border-0 shadow-xl">
-                  <DropdownMenuItem onClick={() => onEdit(bookmark)}>
-                    <Edit className="h-4 w-4 mr-2 text-secondary-500" />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onDelete(bookmark.id)} className="text-error-600 hover:bg-error-50">
-                    <Trash2 className="h-4 w-4 mr-2 text-error-500" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-700 text-sm leading-relaxed mb-4 line-clamp-3">
-            {bookmark.description}
-          </p>
-          <div className="flex items-center justify-between">
-            <div className="flex flex-wrap gap-2">
-              {bookmark.tags.map(tag => (
-                <Badge key={tag} className="text-xs tag-gradient">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-            <Button
-              variant="outline" 
-              size="sm"
-              asChild
-              className="flex items-center gap-1 hover:bg-secondary-50 hover:border-secondary-300 transition-all duration-200"
-            >
-              <a href={bookmark.url} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-3 w-3 text-secondary-500" />
-                Visit
-              </a>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onEdit(bookmark)}>
+                <Edit className="h-4 w-4 mr-2" /> Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDelete(bookmark.id)} className="text-error-600 hover:bg-error-50">
+                <Trash2 className="h-4 w-4 mr-2" /> Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+      {/* Title */}
+      <div className="font-mono text-white text-base px-4 pt-3 pb-2 truncate">
+        {bookmark.title}
+      </div>
+      {/* Content */}
+      <div className="font-mono text-gray-200 text-sm px-4 pb-3">
+        {bookmark.description}
+      </div>
+      {/* Tags */}
+      {bookmark.tags.length > 0 && (
+        <div className="flex flex-wrap gap-2 px-4 mb-2">
+          {bookmark.tags.map(tag => (
+            <span key={tag} className="bg-[#2D313A] text-xs text-gray-400 px-2 py-0.5 rounded-full">{tag}</span>
+          ))}
+        </div>
+      )}
+      {/* Meta */}
+      <div className="text-xs text-gray-500 px-4 pb-2 flex flex-col gap-1">
+        <span>{getDomain(bookmark.url)}</span>
+        <span>{formatDate(new Date(bookmark.createdAt))}</span>
+      </div>
+    </div>
   );
 }

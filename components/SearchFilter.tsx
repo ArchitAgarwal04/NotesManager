@@ -47,7 +47,7 @@ export default function SearchFilter({
             placeholder={placeholder}
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10 input-focus border-primary-200 bg-white/80"
+            className="pl-8 py-2 h-9 text-sm rounded-md border border-white/20 bg-white/10 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-white/20 focus:border-white/40 transition-all duration-200 shadow-none"
           />
         </div>
         <div className="flex gap-2">

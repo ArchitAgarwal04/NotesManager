@@ -16,18 +16,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { initializeAuth } = useAuthStore();
-  
-  const hideNavbar = pathname === '/login' || pathname === '/signup';
-
-  useEffect(() => {
-    initializeAuth();
-  }, [initializeAuth]);
+  const showNavbar = pathname !== '/login' && pathname !== '/signup';
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        {!hideNavbar && <Navbar />}
+        {showNavbar && <Navbar />}
         <main>{children}</main>
         <Toaster />
       </body>

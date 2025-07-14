@@ -51,122 +51,78 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-      </div>
-      
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-md relative z-10"
-      >
+    <div className="min-h-screen bg-gradient-to-br from-black via-[#191C3A] to-black flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-[#23272E] rounded-xl shadow-2xl border border-[#2D313A]/80 p-8">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center space-x-2">
-            <div className="p-2 bg-white rounded-lg shadow-lg">
-              <BookOpen className="h-8 w-8 text-primary-600" />
-            </div>
-            <span className="text-2xl font-bold text-white">NotesKeeper</span>
-          </Link>
-          <p className="text-white/80 mt-2">Create your digital memory account</p>
+          <span className="text-3xl font-extrabold text-white font-mono">Sign Up</span>
+          <p className="text-gray-400 mt-2">Create your digital memory account</p>
         </div>
-
-        <Card className="glass-effect shadow-2xl border-0">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center gradient-text">Sign Up</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary-400" />
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="Enter your full name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="pl-10 input-focus border-primary-200"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary-400" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 input-focus border-primary-200"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary-400" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Create a password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 input-focus border-primary-200"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary-400" />
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="Confirm your password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10 input-focus border-primary-200"
-                    required
-                  />
-                </div>
-              </div>
-
-              {error && (
-                <div className="flex items-center space-x-2 text-red-600 text-sm">
-                  <AlertCircle className="h-4 w-4 text-error-500" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              <Button type="submit" className="w-full btn-gradient" disabled={isLoading}>
-                {isLoading ? 'Creating account...' : 'Create Account'}
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-gray-600">
-                Already have an account?{' '}
-                <Link href="/login" className="text-primary-600 hover:text-primary-700 font-medium hover:underline">
-                  Sign in here
-                </Link>
-              </p>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-white">Full Name</Label>
+            <Input
+              id="name"
+              type="text"
+              placeholder="Enter your full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="bg-[#181A20] border border-white/10 text-white placeholder:text-gray-400 rounded-md px-4 py-2 text-sm"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-white">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="bg-[#181A20] border border-white/10 text-white placeholder:text-gray-400 rounded-md px-4 py-2 text-sm"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-white">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="bg-[#181A20] border border-white/10 text-white placeholder:text-gray-400 rounded-md px-4 py-2 text-sm"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="text-white">Confirm Password</Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="bg-[#181A20] border border-white/10 text-white placeholder:text-gray-400 rounded-md px-4 py-2 text-sm"
+              required
+            />
+          </div>
+          {error && (
+            <div className="flex items-center space-x-2 text-red-500 text-sm">
+              <AlertCircle className="h-4 w-4" />
+              <span>{error}</span>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+          )}
+          <Button type="submit" className="w-full bg-gradient-to-r from-green-400 to-green-600 text-white font-bold rounded-full py-3 shadow-lg mt-2">
+            {isLoading ? 'Signing up...' : 'Sign Up'}
+          </Button>
+        </form>
+        <div className="mt-6 text-center">
+          <p className="text-gray-400">
+            Already have an account?{' '}
+            <Link href="/login" className="text-green-400 hover:underline font-medium">Sign in here</Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
