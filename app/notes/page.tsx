@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNotesStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Plus, BookOpen, Heart } from 'lucide-react';
@@ -23,6 +23,7 @@ export default function Notes() {
     setSearchTerm,
     setSelectedTags,
     toggleFavorite,
+    fetchNotes,
   } = useNotesStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,7 +64,11 @@ export default function Notes() {
     return Array.from(tags);
   }, [notes]);
 
-  const handleAddNote = () => {
+  useEffect(() => {
+    fetchNotes();
+  }, [searchTerm, selectedTags]);
+
+  const handleAddNote = async () => {
     setEditingNote(null);
     setIsModalOpen(true);
   };
@@ -73,23 +78,27 @@ export default function Notes() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteNote = (id: string) => {
-    deleteNote(id);
+  const handleDeleteNote = async (id: string) => {
+    await deleteNote(id);
+    await fetchNotes();
     toast.success('Note deleted successfully');
   };
 
-  const handleSaveNote = (noteData: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => {
-    addNote(noteData);
+  const handleSaveNote = async (noteData: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => {
+    await addNote(noteData);
+    await fetchNotes();
     toast.success('Note created successfully');
   };
 
-  const handleUpdateNote = (id: string, updates: Partial<Note>) => {
-    updateNote(id, updates);
+  const handleUpdateNote = async (id: string, updates: Partial<Note>) => {
+    await updateNote(id, updates);
+    await fetchNotes();
     toast.success('Note updated successfully');
   };
 
-  const handleToggleFavorite = (id: string) => {
-    toggleFavorite(id);
+  const handleToggleFavorite = async (id: string) => {
+    await toggleFavorite(id);
+    await fetchNotes();
     const note = notes.find(n => n.id === id);
     if (note) {
       toast.success(note.favorite ? 'Removed from favorites' : 'Added to favorites');

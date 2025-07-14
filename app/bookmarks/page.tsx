@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useBookmarksStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Plus, Bookmark, Heart } from 'lucide-react';
@@ -23,7 +23,12 @@ export default function Bookmarks() {
     setSearchTerm,
     setSelectedTags,
     toggleFavorite,
+    fetchBookmarks,
   } = useBookmarksStore();
+
+  useEffect(() => {
+    fetchBookmarks();
+  }, [searchTerm, selectedTags]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBookmark, setEditingBookmark] = useState<BookmarkType | null>(null);
@@ -64,7 +69,7 @@ export default function Bookmarks() {
     return Array.from(tags);
   }, [bookmarks]);
 
-  const handleAddBookmark = () => {
+  const handleAddBookmark = async () => {
     setEditingBookmark(null);
     setIsModalOpen(true);
   };
@@ -74,23 +79,27 @@ export default function Bookmarks() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteBookmark = (id: string) => {
-    deleteBookmark(id);
+  const handleDeleteBookmark = async (id: string) => {
+    await deleteBookmark(id);
+    await fetchBookmarks();
     toast.success('Bookmark deleted successfully');
   };
 
-  const handleSaveBookmark = (bookmarkData: Omit<BookmarkType, 'id' | 'createdAt' | 'updatedAt'>) => {
-    addBookmark(bookmarkData);
+  const handleSaveBookmark = async (bookmarkData: Omit<BookmarkType, 'id' | 'createdAt' | 'updatedAt'>) => {
+    await addBookmark(bookmarkData);
+    await fetchBookmarks();
     toast.success('Bookmark added successfully');
   };
 
-  const handleUpdateBookmark = (id: string, updates: Partial<BookmarkType>) => {
-    updateBookmark(id, updates);
+  const handleUpdateBookmark = async (id: string, updates: Partial<BookmarkType>) => {
+    await updateBookmark(id, updates);
+    await fetchBookmarks();
     toast.success('Bookmark updated successfully');
   };
 
-  const handleToggleFavorite = (id: string) => {
-    toggleFavorite(id);
+  const handleToggleFavorite = async (id: string) => {
+    await toggleFavorite(id);
+    await fetchBookmarks();
     const bookmark = bookmarks.find(b => b.id === id);
     if (bookmark) {
       toast.success(bookmark.favorite ? 'Removed from favorites' : 'Added to favorites');

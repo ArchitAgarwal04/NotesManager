@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { User, mockLogin, mockSignup, getStoredUser, storeUser, clearStoredUser } from './auth';
+import { User, loginApi, signupApi, getStoredUser, storeUser, clearStoredUser } from './auth';
 
 interface AuthState {
   user: User | null;
@@ -16,7 +16,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (email: string, password: string) => {
     set({ isLoading: true });
     try {
-      const user = await mockLogin(email, password);
+      const user = await loginApi(email, password);
       storeUser(user);
       set({ user, isLoading: false });
     } catch (error) {
@@ -27,7 +27,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   signup: async (name: string, email: string, password: string) => {
     set({ isLoading: true });
     try {
-      const user = await mockSignup(name, email, password);
+      const user = await signupApi(name, email, password);
       storeUser(user);
       set({ user, isLoading: false });
     } catch (error) {
@@ -45,161 +45,187 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 }));
 
-// Notes store
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
 export interface Note {
   id: string;
+  _id?: string;
   title: string;
   content: string;
   tags: string[];
   favorite: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 interface NotesState {
   notes: Note[];
   searchTerm: string;
   selectedTags: string[];
-  addNote: (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateNote: (id: string, updates: Partial<Note>) => void;
-  deleteNote: (id: string) => void;
+  addNote: (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateNote: (id: string, updates: Partial<Note>) => Promise<void>;
+  deleteNote: (id: string) => Promise<void>;
   setSearchTerm: (term: string) => void;
   setSelectedTags: (tags: string[]) => void;
-  toggleFavorite: (id: string) => void;
+  toggleFavorite: (id: string) => Promise<void>;
+  fetchNotes: () => Promise<void>;
 }
 
 export const useNotesStore = create<NotesState>((set, get) => ({
-  notes: [
-    {
-      id: '1',
-      title: 'Welcome to Notes',
-      content: 'This is your first note. You can edit or delete it anytime.',
-      tags: ['welcome', 'demo'],
-      favorite: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      id: '2',
-      title: 'Meeting Notes',
-      content: 'Important points from today\'s meeting:\n- Project deadline: Next Friday\n- Need to review design mockups\n- Schedule follow-up meeting',
-      tags: ['work', 'meeting'],
-      favorite: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ],
+  notes: [],
   searchTerm: '',
   selectedTags: [],
-  addNote: (note) => {
-    const newNote: Note = {
-      ...note,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    set((state) => ({ notes: [newNote, ...state.notes] }));
+  fetchNotes: async () => {
+    const user = getStoredUser();
+    if (!user) return;
+    let url = `${BASE_URL}/notes`;
+    const { searchTerm, selectedTags } = get();
+    const params = [];
+    if (searchTerm) params.push(`q=${encodeURIComponent(searchTerm)}`);
+    if (selectedTags.length > 0) params.push(`tags=${selectedTags.join(',')}`);
+    if (params.length > 0) url += `?${params.join('&')}`;
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${user.token}` },
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    set({ notes: data.map((n: any) => ({ ...n, id: n._id })) });
   },
-  updateNote: (id, updates) => {
-    set((state) => ({
-      notes: state.notes.map((note) =>
-        note.id === id ? { ...note, ...updates, updatedAt: new Date() } : note
-      ),
-    }));
+  addNote: async (note) => {
+    const user = getStoredUser();
+    if (!user) return;
+    const res = await fetch(`${BASE_URL}/notes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.token}`,
+      },
+      body: JSON.stringify(note),
+    });
+    if (!res.ok) throw new Error('Failed to add note');
+    await get().fetchNotes();
   },
-  deleteNote: (id) => {
-    set((state) => ({
-      notes: state.notes.filter((note) => note.id !== id),
-    }));
+  updateNote: async (id, updates) => {
+    const user = getStoredUser();
+    if (!user) return;
+    const res = await fetch(`${BASE_URL}/notes/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.token}`,
+      },
+      body: JSON.stringify(updates),
+    });
+    if (!res.ok) throw new Error('Failed to update note');
+    await get().fetchNotes();
+  },
+  deleteNote: async (id) => {
+    const user = getStoredUser();
+    if (!user) return;
+    const res = await fetch(`${BASE_URL}/notes/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${user.token}` },
+    });
+    if (!res.ok) throw new Error('Failed to delete note');
+    await get().fetchNotes();
   },
   setSearchTerm: (term) => set({ searchTerm: term }),
   setSelectedTags: (tags) => set({ selectedTags: tags }),
-  toggleFavorite: (id) => {
-    set((state) => ({
-      notes: state.notes.map((note) =>
-        note.id === id ? { ...note, favorite: !note.favorite } : note
-      ),
-    }));
+  toggleFavorite: async (id) => {
+    const note = get().notes.find((n) => n.id === id);
+    if (!note) return;
+    await get().updateNote(id, { favorite: !note.favorite });
   },
 }));
 
-// Bookmarks store
 export interface Bookmark {
   id: string;
+  _id?: string;
   url: string;
   title: string;
   description: string;
   tags: string[];
   favorite: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 interface BookmarksState {
   bookmarks: Bookmark[];
   searchTerm: string;
   selectedTags: string[];
-  addBookmark: (bookmark: Omit<Bookmark, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateBookmark: (id: string, updates: Partial<Bookmark>) => void;
-  deleteBookmark: (id: string) => void;
+  addBookmark: (bookmark: Omit<Bookmark, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateBookmark: (id: string, updates: Partial<Bookmark>) => Promise<void>;
+  deleteBookmark: (id: string) => Promise<void>;
   setSearchTerm: (term: string) => void;
   setSelectedTags: (tags: string[]) => void;
-  toggleFavorite: (id: string) => void;
+  toggleFavorite: (id: string) => Promise<void>;
+  fetchBookmarks: () => Promise<void>;
 }
 
-export const useBookmarksStore = create<BookmarksState>((set) => ({
-  bookmarks: [
-    {
-      id: '1',
-      url: 'https://tailwindcss.com',
-      title: 'Tailwind CSS',
-      description: 'A utility-first CSS framework for rapidly building custom designs.',
-      tags: ['css', 'framework', 'development'],
-      favorite: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      id: '2',
-      url: 'https://nextjs.org',
-      title: 'Next.js',
-      description: 'The React framework for production applications.',
-      tags: ['react', 'framework', 'development'],
-      favorite: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ],
+export const useBookmarksStore = create<BookmarksState>((set, get) => ({
+  bookmarks: [],
   searchTerm: '',
   selectedTags: [],
-  addBookmark: (bookmark) => {
-    const newBookmark: Bookmark = {
-      ...bookmark,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    set((state) => ({ bookmarks: [newBookmark, ...state.bookmarks] }));
+  fetchBookmarks: async () => {
+    const user = getStoredUser();
+    if (!user) return;
+    let url = `${BASE_URL}/bookmarks`;
+    const { searchTerm, selectedTags } = get();
+    const params = [];
+    if (searchTerm) params.push(`q=${encodeURIComponent(searchTerm)}`);
+    if (selectedTags.length > 0) params.push(`tags=${selectedTags.join(',')}`);
+    if (params.length > 0) url += `?${params.join('&')}`;
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${user.token}` },
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    set({ bookmarks: data.map((b: any) => ({ ...b, id: b._id })) });
   },
-  updateBookmark: (id, updates) => {
-    set((state) => ({
-      bookmarks: state.bookmarks.map((bookmark) =>
-        bookmark.id === id ? { ...bookmark, ...updates, updatedAt: new Date() } : bookmark
-      ),
-    }));
+  addBookmark: async (bookmark) => {
+    const user = getStoredUser();
+    if (!user) return;
+    const res = await fetch(`${BASE_URL}/bookmarks`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.token}`,
+      },
+      body: JSON.stringify(bookmark),
+    });
+    if (!res.ok) throw new Error('Failed to add bookmark');
+    await get().fetchBookmarks();
   },
-  deleteBookmark: (id) => {
-    set((state) => ({
-      bookmarks: state.bookmarks.filter((bookmark) => bookmark.id !== id),
-    }));
+  updateBookmark: async (id, updates) => {
+    const user = getStoredUser();
+    if (!user) return;
+    const res = await fetch(`${BASE_URL}/bookmarks/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.token}`,
+      },
+      body: JSON.stringify(updates),
+    });
+    if (!res.ok) throw new Error('Failed to update bookmark');
+    await get().fetchBookmarks();
+  },
+  deleteBookmark: async (id) => {
+    const user = getStoredUser();
+    if (!user) return;
+    const res = await fetch(`${BASE_URL}/bookmarks/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${user.token}` },
+    });
+    if (!res.ok) throw new Error('Failed to delete bookmark');
+    await get().fetchBookmarks();
   },
   setSearchTerm: (term) => set({ searchTerm: term }),
   setSelectedTags: (tags) => set({ selectedTags: tags }),
-  toggleFavorite: (id) => {
-    set((state) => ({
-      bookmarks: state.bookmarks.map((bookmark) =>
-        bookmark.id === id ? { ...bookmark, favorite: !bookmark.favorite } : bookmark
-      ),
-    }));
+  toggleFavorite: async (id) => {
+    const bookmark = get().bookmarks.find((b) => b.id === id);
+    if (!bookmark) return;
+    await get().updateBookmark(id, { favorite: !bookmark.favorite });
   },
 }));

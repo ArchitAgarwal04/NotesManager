@@ -2,6 +2,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  token: string;
 }
 
 export interface AuthState {
@@ -12,18 +13,29 @@ export interface AuthState {
   logout: () => void;
 }
 
-// Mock API functions - replace with real API calls
-export const mockLogin = async (email: string, password: string): Promise<User> => {
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-  if (email === 'test@example.com' && password === 'password') {
-    return { id: '1', name: 'John Doe', email: 'test@example.com' };
-  }
-  throw new Error('Invalid credentials');
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+export const loginApi = async (email: string, password: string): Promise<User> => {
+  const res = await fetch(`${BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) throw new Error('Invalid credentials');
+  const data = await res.json();
+  // Optionally fetch user profile if needed
+  return { id: '', name: '', email, token: data.token };
 };
 
-export const mockSignup = async (name: string, email: string, password: string): Promise<User> => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return { id: '1', name, email };
+export const signupApi = async (name: string, email: string, password: string): Promise<User> => {
+  const res = await fetch(`${BASE_URL}/auth/signup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, password }),
+  });
+  if (!res.ok) throw new Error('Signup failed');
+  const data = await res.json();
+  return { id: '', name, email, token: data.token };
 };
 
 export const getStoredUser = (): User | null => {
