@@ -152,9 +152,5 @@ NotesManager/
 
 ---
 
-## 📄 License
-MIT
 
----
-
-**Built with ❤️ by [ArchitAgarwal04](https://github.com/ArchitAgarwal04/NotesManager.git)**
+**Built by [ArchitAgarwal04](https://github.com/ArchitAgarwal04/NotesManager.git)**
